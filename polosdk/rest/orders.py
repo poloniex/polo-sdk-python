@@ -100,9 +100,10 @@ class Orders:
             RequestError: An error occurred communicating with trade engine.
 
         Example:
-            Limit Buy 0.00025 BTC_USDT at 20,000.00:
+            Limit Buy 0.00025 BTC_USDT at 18,000.00 when price hits 20000 USDT:
                  response = client.orders().create(client_order_id='123Abc',
-                                                   price='20000',
+                                                   price='18000',
+                                                   stop_price='20000.00'
                                                    quantity='0.00025',
                                                    side='BUY',
                                                    symbol='BTC_USDT',

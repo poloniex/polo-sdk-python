@@ -150,12 +150,12 @@ git clone https://github.com/poloniex/polo-sdk-python
   - Transfer Activity
   ```python
   # Get a list of transfer records of a user
-  response = client.accounts().get_transfer_records()
+  response = client.accounts().get_transfers()
   ```
 
   ```python
   # Get a transfer record of a user by id
-  response = client.accounts().get_transfer_records_by_id('501')
+  response = client.accounts().get_transfer('501')
   ```
 
   - Fee Info
@@ -168,7 +168,7 @@ git clone https://github.com/poloniex/polo-sdk-python
   - Deposit Addresses
   ```python
   # Get all deposit addresses for a user
-  response = client.wallets().get_addresses()
+  response = client.wallets().get_deposit_addresses()
   ```
 
   - Generate Address
@@ -181,7 +181,7 @@ git clone https://github.com/poloniex/polo-sdk-python
   ```python
   # Immediately places a withdrawal for a given currency, with no email confirmation
   # In order to use this method, withdrawal privilege must be enabled for your API key
-  response = client.wallets().withdraw_currency('ETH', '1.50', '0x123abc')
+  response = client.wallets().withdraw('ETH', '1.50', '0x123abc')
   ```
 
   - Wallet Activity
@@ -193,8 +193,8 @@ git clone https://github.com/poloniex/polo-sdk-python
 #### Orders
   - Create Order
   ```python
-  # Create a market order for 0.00025 BTC
-  response = client.orders().create(side='BUY', amount='0.00025', symbol='BTC_USDT')
+  # Create a market order for 5 USDT of BTC
+  response = client.orders().create(side='BUY', amount='5', symbol='BTC_USDT')
   ```
 
   ```python
@@ -275,14 +275,15 @@ git clone https://github.com/poloniex/polo-sdk-python
 #### Smart Orders
   - Create Order
   ```python
-  # Create a smart order for an account
-  response = client.smartorders().create(client_order_id='999999910',
-                                         time_in_force='FOK',
-                                         quantity='10',
+  # Create a smart order for an account (Limit Buy 0.00025 BTC_USDT at 18,000.00 when price hits 20000 USDT)
+  response = client.smartorders().create(client_order_id='123Abc',
+                                         price='18000',
+                                         stop_price='20000.00',
+                                         quantity='0.00025',
                                          side='BUY',
                                          symbol='BTC_USDT',
-                                         type='STOP_LIMIT',
-                                         stop_price='60000.00')
+                                         type='LIMIT',
+                                         time_in_force='IOC')
   ```
 
   - Open Orders
