@@ -17,17 +17,17 @@ class Orders:
         """
         self._request = Request(api_key, api_secret, url)
 
-    def get_all(self, account_type=None, **kwargs):
+    def get_all(self, account_type=None, begins_from=None, **kwargs):
         """
         Get a list of active orders for an account.
 
         Args:
             account_type (str, optional): SPOT is the default and only supported one.
+            begins_from (int, optional): It is 'orderId'. The query begin at 'from', and it is 0 when you first query.
 
         Keyword Args:
             symbol (str, optional): The symbol to trade,like BTC_USDT. Default is for all symbols if not specified.
             side (str, optional): Possible sides(BUY, SELL),
-            from (int, optional): It is 'orderId'. The query begin at 'from', and it is 0 when you first query.
             direction (str, optional): Possible values(PRE, NEXT)
             limit (int, optional): The max number of orders could be returned.
 
@@ -69,6 +69,9 @@ class Orders:
 
         if account_type is not None:
             params.update({'accountType': account_type})
+
+        if begins_from is not None:
+            params.update({'from': begins_from})
 
         return self._request('GET', '/orders', True, params=params)
 
@@ -314,7 +317,7 @@ class Orders:
 
         return self._request('DELETE', '/orders/cancelByIds', True, body=body)
 
-    def get_history(self, account_type=None, hide_cancel=None, start_time=None, end_time=None, **kwargs):
+    def get_history(self, account_type=None, hide_cancel=None, start_time=None, end_time=None, begins_from=None, **kwargs):
         """
         Get a list of historical orders in an account.
 
@@ -325,12 +328,12 @@ class Orders:
             start_time (int, optional): (milliseconds since UNIX epoch) Orders updated before start_time will not be
                                         retrieved.
             end_time (int, optional): (milliseconds since UNIX epoch) Orders updated after end_time will not be retrieved.
+            begins_from (int, optional): An 'orderId'. The query begins at ‘from'.
 
         Keyword Args:
             type (str, optional): MARKET, LIMIT, LIMIT_MAKER (Default: all types).
             side (str, optional): BUY, SELL (Default: both sides).
             symbol (str, optional): Any supported symbol (Default: all symbols).
-            from (int, optional): An 'orderId'. The query begins at ‘from'.
             direction (str, optional): PRE, NEXT The direction before or after ‘from'.
             states (str, optional): FAILED, FILLED, CANCELED. PARTIALLY_CANCELED Multiple states can be specified and
                                     separated with comma. (Default: all states)
@@ -384,6 +387,9 @@ class Orders:
 
         if end_time is not None:
             params.update({'endTime': end_time})
+
+        if begins_from is not None:
+            params.update({'from': begins_from})
 
         return self._request('GET', '/orders/history', True, params=params)
 
@@ -481,3 +487,51 @@ class Orders:
             print(response)
         """
         return self._request('GET', f'/orders/{order_id}/trades', True)
+
+    def set_kill_switch(self, timeout):
+        """
+        Kill switch mechanism allows to set a timer that cancels all regular and smartorders after the timeout has
+        expired. Timeout can be reset by calling this command again with a new timeout value. A timeout value of -1
+        disables the timer. Timeout is defined in seconds.
+
+        Args:
+            timeout (str, required): Timer value in seconds; range is -1 and 10 to 600.  Must be a number.
+
+        Returns:
+            A list of json objects with kill switch results:
+            {
+                'startTime': (int) Time when timer is started (milliseconds since UNIX epoch),
+                'cancellationTime': (int) Time when timer is set to expire which will trigger cancellation (milliseconds since UNIX epoch)
+            }
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.orders().set_kill_switch('15')
+            print(response)
+        """
+
+        body = {'timeout': str(timeout)}
+        return self._request('POST', '/orders/killSwitch', True, body=body)
+
+    def get_kill_switch(self):
+        """
+        Get status of kill switch. If there is an active kill switch then the start and cancellation time is returned.
+        If no active kill switch then an error message with code is returned.
+
+        Returns:
+            Json object with kill switch results:
+            {
+                'startTime': (int) Time when timer is started (milliseconds since UNIX epoch),
+                'cancellationTime': (int) Time when timer is set to expire which will trigger cancellation (milliseconds since UNIX epoch)
+            }
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.orders().get_kill_switch()
+            print(response)
+        """
+        return self._request('GET', '/orders/killSwitchStatus', True)

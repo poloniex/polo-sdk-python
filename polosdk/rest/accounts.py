@@ -168,13 +168,16 @@ class Accounts:
         }
         return self._request('POST', '/accounts/transfer', True, body=body)
 
-    def get_transfers(self, **kwargs):
+    def get_transfers(self, begins_from=None, **kwargs):
         """
         Get a list of transfer records of a user.
 
+        Args:
+            begins_from (int, optional): It is 'transferId'. The query begin at ‘from', and the default is 0.
+
+
         Keyword Args:
             limit (int, optional): The max number of records could be returned.
-            from (int, optional): It is 'transferId'. The query begin at ‘from', and the default is 0.
             direction (str, optional): PRE, NEXT, default is NEXT.
             currency (str, optional): The transferred currency, like USDT. Default is for all currencies, if not specified.
 
@@ -201,7 +204,12 @@ class Accounts:
             response = client.accounts().get_transfers()
             print(response)
         """
-        return self._request('GET', '/accounts/transfer', True, kwargs)
+        params = {}
+        params.update(kwargs)
+        if begins_from is not None:
+            params.update({'from': begins_from})
+
+        return self._request('GET', '/accounts/transfer', True, params=params)
 
     def get_transfer(self, transfer_id):
         """
@@ -230,3 +238,60 @@ class Accounts:
             print(response)
         """
         return self._request('GET', f'/accounts/transfer/{transfer_id}', True)
+
+    def get_activity(self, start_time=None, end_time=None, activity_type=None, begins_from=None, **kwargs):
+        """
+        Get a list of activities such as airdrop, rebates, staking, credit/debit adjustments, and other (historical adjustments).
+
+        Args
+            start_time (int, optional): Trades filled before startTime will not be retrieved.(milliseconds since UNIX epoch)
+            end_time (int, optional): Trades filled after endTime will not be retrieved.(milliseconds since UNIX epoch)
+            activity_type (int, optional): Type of activity: ALL: 200, AIRDROP: 201, COMMISSION_REBATE: 202, STAKING: 203,
+                                                             REFERAL_REBATE: 204, CREDIT_ADJUSTMENT: 104,
+                                                             DEBIT_ADJUSTMENT: 105, OTHER: 199.  Must use numeric code.
+            begins_from (int, optional): It is 'id'. The query begin at ‘from', and the default is 0.
+
+        Keyword Args:
+            limit (int, optional): The max number of records could be returned. Default is 100 and max is 1000.
+            direction (str, optional): PRE, NEXT, default is NEXT.
+            currency (str, optional): The transferred currency, like USDT. Default is for all currencies, if not specified.
+
+        Returns:
+            List of json objects with account activity information:
+            [
+                {
+                    'id': (str) Activity ID,
+                    'currency': (str) Currency like BTC, ETH etc,
+                    'amount': (str) Amount of the activity (can be negative),
+                    'state': (str) State of the activity (ex. SUCCESS),
+                    'createTime': (int) Datetime of the activity,
+                    'description': (str) Activity details,
+                    'activityType': (int) type of activity
+                },
+                {...},
+                ...
+            ]
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.accounts().get_activity()
+            print(response)
+        """
+        params = {}
+        params.update(kwargs)
+
+        if start_time is not None:
+            params.update({'startTime': start_time})
+
+        if end_time is not None:
+            params.update({'endTime': end_time})
+
+        if activity_type is not None:
+            params.update({'activityType': activity_type})
+
+        if begins_from is not None:
+            params.update({'from': begins_from})
+
+        return self._request('GET', '/accounts/activity', True, params=params)

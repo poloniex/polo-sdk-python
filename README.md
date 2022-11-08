@@ -141,6 +141,12 @@ git clone https://github.com/poloniex/polo-sdk-python
   response = client.accounts().get_account_balances('123')
   ```
 
+  - Account Activity
+  ```python
+  # Get a list of activities such as airdrop, rebates, staking, credit/debit adjustments, and other (historical adjustments).
+  response = client.accounts().get_activity()
+  ```
+
   - Transfer Balances
   ```python
   # Transfer amount of currency from an account to another account for a user
@@ -270,6 +276,18 @@ git clone https://github.com/poloniex/polo-sdk-python
   ```python
   # Get a list of all trades for an order specified by its orderId
   response = client.orders().get_trades('21934611974062080')
+  ```
+
+  - Kill Switch
+  ```python
+  # Set a timer that cancels all regular and smartorders after the timeout has expired.
+  response = client.orders().set_kill_switch('15')
+  ```
+
+  - Kill Switch Status
+  ```python
+  # Get status of kill switch.
+  response = client.orders().get_kill_switch()
   ```
 
 #### Smart Orders

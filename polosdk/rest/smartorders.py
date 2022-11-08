@@ -318,7 +318,7 @@ class SmartOrders:
 
         return self._request('DELETE', '/smartorders/cancelByIds', True, body=body)
 
-    def get_history(self, account_type=None, hide_cancel=None, start_time=None, end_time=None, **kwargs):
+    def get_history(self, account_type=None, hide_cancel=None, start_time=None, end_time=None, begins_from=None, **kwargs):
         """
         Get a list of historical smart orders in an account.
 
@@ -329,12 +329,12 @@ class SmartOrders:
             start_time (int, optional): (milliseconds since UNIX epoch) Orders updated before start_time will not be
                                         retrieved.
             end_time (int, optional): (milliseconds since UNIX epoch) Orders updated after end_time will not be retrieved.
+            begins_from (int, optional): An 'orderId'. The query begins at ‘from'.
 
         Keyword Args:
             type (str, optional): MARKET, LIMIT, LIMIT_MAKER (Default: all types).
             side (str, optional): BUY, SELL (Default: both sides).
             symbol (str, optional): Any supported symbol (Default: all symbols).
-            from (int, optional): An 'orderId'. The query begins at ‘from'.
             direction (str, optional): PRE, NEXT The direction before or after ‘from'.
             states (str, optional): FAILED, FILLED, CANCELED. PARTIALLY_CANCELED Multiple states can be specified and
                                     separated with comma. (Default: all states)
@@ -388,5 +388,8 @@ class SmartOrders:
 
         if end_time is not None:
             params.update({'endTime': end_time})
+
+        if begins_from is not None:
+            params.update({'from': begins_from})
 
         return self._request('GET', '/smartorders/history', True, params=params)
