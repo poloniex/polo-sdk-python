@@ -183,7 +183,8 @@ class Markets:
                         'closeTime': (int) Close time for the 24h interval,
                         'displayName': (str) Symbol display name,
                         'dailyChange': (str) Daily change in decimal,
-                        'ts': (int) Time the record was pushed
+                        'ts': (int) Time the record was pushed,
+                        'markPrice': (str) Current mark price
                     },
                     {...},
                     ...
@@ -220,7 +221,8 @@ class Markets:
                     'closeTime': (int) Close time for the 24h interval,
                     'displayName': (str) Symbol display name,
                     'dailyChange': (str) Daily change in decimal,
-                    'ts': (int) Time the record was pushed
+                    'ts': (int) Time the record was pushed,
+                    'markPrice': (str) Current mark price
                 }
 
         Raises:
@@ -266,3 +268,152 @@ class Markets:
             print(response)
         """
         return self._request('GET', f'/markets/{symbol}/trades', params=kwargs)
+
+    def get_mark_prices(self):
+        """
+        Get latest mark price for all cross margin symbols.
+
+        Returns:
+            Json object list with mark price information.
+            [
+                {
+                    'symbol': (str) Symbol name,
+                    'markPrice': (str) Current mark price,
+                    'time': (int) Time the record was created
+                },
+                {...},
+                ...
+            ]
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.markets().get_mark_prices()
+            print(response)
+        """
+        return self._request('GET', '/markets/markPrice')
+
+    def get_mark_price(self, symbol):
+        """
+        Get latest mark price for a single cross margin symbol.
+
+        Returns:
+            Json object with mark price information.
+            {
+                'symbol': (str) Symbol name,
+                'markPrice': (str) Current mark price,
+                'time': (int) Time the record was created
+            }
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.markets().get_mark_price('BTC_USDT')
+            print(response)
+        """
+        return self._request('GET', f'/markets/{symbol}/markPrice')
+
+    def get_mark_price_components(self, symbol):
+        """
+        Get components of the mark price for a given symbol.
+
+        Returns:
+            Json object with mark price component information.
+            {
+                'markPrice': (str) Symbol name,
+                'symbol': (str) Current mark price,
+                'ts': (int) Time the record was created,
+                'components': {
+                    'symbol': (str) Symbol name,
+                    'symbolPrice': (str) Symbol price,
+                    'weight': (str) Weight assigned to the exchange price,
+                    'convertPrice': (str) Symbol price converted to index,
+                    'exchange': (str) Name of exchange
+                }
+            }
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.markets().get_mark_price_components('BTC_USDT')
+            print(response)
+        """
+        return self._request('GET', f'/markets/{symbol}/markPriceComponents')
+
+    def get_collateral_info_all(self):
+        """
+        Get collateral information for all currencies.
+
+        Returns:
+            List of json objects with currency collateral information.
+            [
+                {
+                    'currency': (str) Currency name,
+                    'collateralRate': (str) Collateral rate of the currency in cross margin,
+                    'initialMarginRate': (str) Initial margin rate of this currency,
+                    'maintenanceMarginRate': (str) Maintenance margin rate of this currency
+                },
+                {...},
+                ...
+            ]
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.markets().get_collateral_info_all()
+            print(response)
+        """
+        return self._request('GET', '/markets/collateralInfo')
+
+    def get_collateral_info(self, currency):
+        """
+        Get collateral information for a single currency.
+
+        Returns:
+            Json objects with currency collateral information.
+            {
+                'currency': (str) Currency name,
+                'collateralRate': (str) Collateral rate of the currency in cross margin,
+                'initialMarginRate': (str) Initial margin rate of this currency,
+                'maintenanceMarginRate': (str) Maintenance margin rate of this currency
+            }
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.markets().get_collateral_info('BTC')
+            print(response)
+        """
+        return self._request('GET', f'/markets/{currency}/collateralInfo')
+
+    def get_borrow_rates(self):
+        """
+        Get borrow rates information for all tiers and currencies.
+
+        Returns:
+            Json objects with borrow rates for currencies.
+            [
+                {
+                    'tier': (str) Tier for borrow rates,
+                    'rates': {
+                        'currency': (str) Currency name,
+                        'dailyBorrowRate': (str) Borrow rate per day,
+                        'hourlyBorrowRate': (str) Borrow rate per hour,
+                        'borrowLimit': (str) Borrow limit amount for the currency
+                    }
+                }
+            ]
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.markets().get_borrow_rates()
+            print(response)
+        """
+        return self._request('GET', '/markets/borrowRatesInfo')

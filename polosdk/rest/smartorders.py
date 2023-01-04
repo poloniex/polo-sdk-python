@@ -234,6 +234,58 @@ class SmartOrders:
 
         return self._request('GET', path, True)
 
+    def cancel_replace(self, order_id, time_in_force=None, proceed_on_failure=None, client_order_id=None, **kwargs):
+        """
+        Cancel an existing untriggered smart order and place a new smart order on the same symbol with details from
+        existing smart order unless amended by new parameters. The replacement smart order can amend price, stopPrice,
+        quantity, amount, type, and timeInForce fields. Specify the existing smart order id in the path; if id is a
+        clientOrderId, prefix with cid: e.g. cid:myId-1. The proceedOnFailure flag is intended to specify whether to
+        continue with new smart order placement in case cancelation of the existing smart order fails.
+
+        Args:
+            order_id (int, required): Id of original order
+            client_order_id (str, optional): clientOrderId of the new order*
+            time_in_force (str, optional): Amended timeInForce; GTC, IOC, FOK (Default: GTC)
+            proceed_on_failure (str, optional): If set to true then new smart order will be placed even if cancelation
+                                                of the existing smart order fails; if set to false (DEFAULT value) then
+                                                new smart order will not be placed if the cancelation of the existing
+                                                smart order fails.
+
+
+        Keyword Args:
+            price (str, optional): Amended price
+            quantity (str, optional): Amended quantity
+            amount (str, optional): Amended amount (needed for MARKET buy)
+            type (str, optional): Amended type; MARKET, LIMIT, LIMIT_MAKER (for placing post only orders)
+
+        Returns:
+            json object with order id and client order id:
+            {
+                'id': (str) Smart order id,
+                'clientOrderId': (str) ClientOrderId user specifies in request or an empty string
+            }
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.smartorders().cancel_replace(order_id, price='19000', proceed_on_failure=True)
+            print(response)
+        """
+        body = {}
+        body.update(kwargs)
+
+        if time_in_force is not None:
+            body.update({'timeInForce': time_in_force})
+
+        if proceed_on_failure is not None:
+            body.update({'proceedOnFailure': proceed_on_failure})
+
+        if client_order_id is not None:
+            body.update({'clientOrderId': client_order_id})
+
+        return self._request('PUT', f'/smartorders/{order_id}', True, body=body)
+
     def cancel_by_id(self, order_id=None, client_order_id=None):
         """
         Cancel a smart order by its id. order_id or client_order_id is required.

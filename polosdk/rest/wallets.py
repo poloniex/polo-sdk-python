@@ -146,10 +146,16 @@ class Wallets:
         body = {'currency': currency}
         return self._request('POST', '/wallets/address', True, body=body)
 
-    def withdraw(self, currency, amount, address):
+    def withdraw(self, currency, amount, address, payment_id=None, allow_borrow=None):
         """
         Immediately places a withdrawal for a given currency, with no email confirmation. In order to use this method,
         withdrawal privilege must be enabled for your API key.
+
+        Some currencies use a common deposit address for everyone on the exchange and designate the account for which
+        this payment is destined by populating paymentID field. In these cases, use /currencies to look up the
+        mainAccount for the currency to find the deposit address and use the address returned by /wallets/addresses or
+        generate one using /wallets/address as the paymentId. Note: currencies will only include a mainAccount property
+        for currencies which require a paymentID.
 
         For currencies where there are multiple networks to choose from (like USDT or BTC), you can specify the chain by
         setting the "currency" parameter to be a multiChain currency name, like USDTTRON, USDTETH, or BTCTRON. You can
@@ -160,6 +166,8 @@ class Wallets:
             currency (str, required): Currency name.
             amount (str, required): Withdrawal amount.
             address (str, required): Withdrawal address.
+            payment_id (str, optional): PaymentId for currencies that use a command deposit address.
+            allow_borrow (bool, optional): Allow to transfer borrowed funds (Default: false)
 
         Returns:
             Json object with the withdrawal reference ID:
@@ -180,4 +188,11 @@ class Wallets:
             'amount': amount,
             'address': address
         }
+
+        if payment_id is not None:
+            body.update({'paymentId': payment_id})
+
+        if allow_borrow is not None:
+            body.update({'allowBorrow': allow_borrow})
+
         return self._request('POST', '/wallets/withdraw', True, body=body)

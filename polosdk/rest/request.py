@@ -1,4 +1,6 @@
 import json
+import urllib
+
 import requests
 import base64
 import hashlib
@@ -25,6 +27,10 @@ class RequestError(Exception):
 
     def __str__(self):
         return f'code: {self.code}, message: {self.message}'
+
+
+def encode_uri_component(component):
+    return urllib.parse.quote(str(component), safe='~()*!\'')
 
 
 class Request:
@@ -88,7 +94,6 @@ class Request:
                                     timeout=self._timeout_sec,
                                     params=params,
                                     data=body)
-
         try:
             response_json = response.json()
         except Exception:
@@ -123,7 +128,7 @@ class Request:
         if len(body) == 0:
             params_internal = {'signTimestamp': timestamp}
             params_internal.update(params)
-            params_auth = [f'{key}={value}' for key, value in sorted(params_internal.items())]
+            params_auth = [f'{key}={encode_uri_component(value)}' for key, value in sorted(params_internal.items())]
             params_auth = '&'.join(params_auth)
         else:
             params_auth = f'requestBody={body}&signTimestamp={timestamp}'

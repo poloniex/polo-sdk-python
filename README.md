@@ -110,6 +110,40 @@ git clone https://github.com/poloniex/polo-sdk-python
   response = client.markets().get_ticker24h_all()
   ```
 
+  - Mark Price
+  ```python
+  # Get latest mark price for a single cross margin symbol
+  response = client.markets().get_mark_price('BTC_USDT')
+  ```
+
+  ```python
+  # Get latest mark price for all cross margin symbols
+  response = client.markets().get_mark_prices()
+  ```
+
+  - Mark Price Components
+  ```python
+  # Get components of the mark price for a given symbol
+  response = client.markets().get_mark_price_components('BTC_USDT')
+  ```
+
+  - Collateral Info
+  ```python
+  # Get collateral information for a single currency
+  response = client.markets().get_collateral_info('BTC')
+  ```
+
+  ```python
+  # Get collateral information for all currencies
+  response = client.markets().get_collateral_info_all()
+  ```
+
+  - Borrow Rates
+  ```python
+  # Get borrow rates information for all tiers and currencies
+  response = client.markets().get_borrow_rates()
+  ```
+
 #### Authenticated Methods
 
   - Instantiate a client
@@ -170,6 +204,59 @@ git clone https://github.com/poloniex/polo-sdk-python
   response = client.accounts().get_fee_info()
   ```
 
+  - Account Margin
+  ```python
+  # Get account margin information
+  response = client.accounts().get_margin()
+  ```
+
+  - Borrow Status
+  ```python
+  # Get borrow status of currencies
+  response = client.accounts().get_borrow_status()
+  ```
+
+  - Maximum Buy/Sell
+  ```python
+  # Get maximum and available buy/sell amount for a given symbol
+  response = client.accounts().get_margin_max('BTC_USDT')
+  ```
+
+#### Subaccounts
+  - Subaccount Information
+  ```python
+  # Get subaccount information
+  response = client.subaccounts().get_accounts()
+  ```
+
+  - Subaccount Balances
+  ```python
+  # Get balances information
+  response = client.subaccounts().get_balances()
+  ```
+
+  ```python
+  # Get balances information by id
+  response = get_account_balances('123')
+  ```
+
+  - Subaccount Transfer
+  ```python
+  # Transfer amount of currency
+  response = client.subaccounts().transfer('USD', '2', '123', 'SPOT', '1234', 'SPOT')
+  ```
+
+  - Subaccount Transfer Records
+  ```python
+  # Get a list of transfer records of a user.
+  response = client.subaccounts().get_transfers()
+  ```
+
+  ```python
+  # Get transfer record by id.
+  response = client.subaccounts().get_transfer()
+  ```
+
 #### Wallets
   - Deposit Addresses
   ```python
@@ -211,6 +298,43 @@ git clone https://github.com/poloniex/polo-sdk-python
                                     symbol='BTC_USDT',
                                     type='LIMIT',
                                     client_order_id='123Abc')
+  ```
+
+  - Create Multiple Orders
+  ```python
+    #Create 2 BTC sells for ~5 USDT and 1 LTC buy for 2.5 USDT using multiple orders request
+    multi_order_request =
+            [
+                {
+                    'price': '20000',
+                    'quantity': '0.00025',
+                    'side': 'SELL',
+                    'symbol': 'BTC_USDT',
+                    'type': 'LIMIT'
+                },
+                {
+                    'price': '50',
+                    'quantity': '0.05',
+                    'side': 'BUY',
+                    'symbol': 'LTC_USDT',
+                    'type': 'LIMIT'
+                },
+                {
+                    'price': '22000',
+                    'quantity': '0.00024',
+                    'side': 'SELL',
+                    'symbol': 'BTC_USDT',
+                    'type': 'LIMIT'
+                }
+            ]
+            
+    response = client.orders().create_multiple(multi_order_request)
+  ```
+
+  - Cancel Replace
+  ```python
+  # Cancel Replace by order id, proceed on cancelation failure.
+  response = client.orders().cancel_replace(order_id, price='19000', proceed_on_failure=True)
   ```
 
   - Open Orders
@@ -320,6 +444,12 @@ git clone https://github.com/poloniex/polo-sdk-python
 
   # Get smart order by order id
   response = client.smartorders().get_by_id(order_id='21934611974062080')
+  ```
+
+  - Cancel Replace
+  ```python
+  # Cancel Replace by smart order id, proceed on cancelation failure.
+  response = client.smartorders().cancel_replace(order_id, price='19000', proceed_on_failure=True)
   ```
 
   - Cancel Order by Id

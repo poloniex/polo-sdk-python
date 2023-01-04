@@ -1,4 +1,5 @@
 from polosdk.rest.accounts import Accounts
+from polosdk.rest.subaccounts import Subaccounts
 from polosdk.rest.markets import Markets
 from polosdk.rest.request import Request
 from polosdk.rest.orders import Orders
@@ -28,6 +29,7 @@ class Client:
             url (str, optional): Url for endpoints, default is set to PROD in Request class.
         """
         self._accounts = Accounts(api_key, api_secret, url)
+        self._subaccounts = Subaccounts(api_key, api_secret, url)
         self._markets = Markets(url)
         self._request = Request(url=url)
         self._orders = Orders(api_key, api_secret, url)
@@ -61,6 +63,10 @@ class Client:
                     'highestBid': (str) Maximum allowed bid,
                     'lowestAsk': (str) Minimum allowed ask,
                     'scales': (str[]) List of allowed scales
+                },
+                'crossMargin': {
+                    'supportCrossMargin': (bool) Indicates if symbol supports cross margin,
+                    'maxLeverage': (int) Maximum supported leverage
                 }
             }
 
@@ -97,6 +103,10 @@ class Client:
                         'minAmount': (str) Minimum required amount,
                         'highestBid': (str) Maximum allowed bid,
                         'lowestAsk': (str) Minimum allowed ask
+                    },
+                    'crossMargin': {
+                        'supportCrossMargin': (bool) Indicates if symbol supports cross margin,
+                        'maxLeverage': (int) Maximum supported leverage
                     }
                 },
                 {...},
@@ -222,6 +232,13 @@ class Client:
             The account class used to make balance and fee info queries.
         """
         return self._accounts
+
+    def subaccounts(self):
+        """
+        Returns:
+            The subaccount class used to make subaccount queries.
+        """
+        return self._subaccounts
 
     def markets(self):
         """

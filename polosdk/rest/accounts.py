@@ -168,13 +168,14 @@ class Accounts:
         }
         return self._request('POST', '/accounts/transfer', True, body=body)
 
-    def get_transfers(self, begins_from=None, **kwargs):
+    def get_transfers(self, begins_from=None, start_time=None, end_time=None, **kwargs):
         """
         Get a list of transfer records of a user.
 
         Args:
             begins_from (int, optional): It is 'transferId'. The query begin at ‘from', and the default is 0.
-
+            start_time (int, optional): Transfers before start time will not be retrieved. (milliseconds since UNIX epoch)
+            end_time (int, optional): Transfers after end time will not be retrieved. (milliseconds since UNIX epoch)
 
         Keyword Args:
             limit (int, optional): The max number of records could be returned.
@@ -208,6 +209,12 @@ class Accounts:
         params.update(kwargs)
         if begins_from is not None:
             params.update({'from': begins_from})
+
+        if start_time is not None:
+            params.update({'startTime': start_time})
+
+        if end_time is not None:
+            params.update({'endTime': end_time})
 
         return self._request('GET', '/accounts/transfer', True, params=params)
 
@@ -295,3 +302,93 @@ class Accounts:
             params.update({'from': begins_from})
 
         return self._request('GET', '/accounts/activity', True, params=params)
+
+    def get_margin(self, account_type='SPOT'):
+        """
+        Get account margin information
+
+        Args:
+            account_type (str, optional): The account type. Currently only SPOT is supported.
+
+        Returns:
+            Json objects with account margin information:
+            {
+                'totalAccountValue': (str) The sum of the usd value of all balances plus unrealized pnl,
+                'totalMargin': (str) Collateral that can be used for margin,
+                'usedMargin': (str) Amount of margin that has been used,
+                'freeMargin': (str) Available free margin,
+                'maintenanceMargin': (str) Minimum amount needed to keep account in good standing; enters liquidation mode if total margin falls below this value,
+                'marginRatio': (str) Is calculated as total margin / maintenance Margin; account enters liquidation mode if this value < 100%,
+                'time': (int) Time the record was created
+            }
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.accounts().get_margin()
+            print(response)
+        """
+        params = {'accountType': account_type}
+
+        return self._request('GET', '/margin/accountMargin', True, params=params)
+
+    def get_borrow_status(self, **kwargs):
+        """
+        Get borrow status of currencies.
+
+        Keyword Args:
+            currency (str, optional): Currency name.
+
+        Returns:
+            List of json objects with borrow status for currency:
+            {
+                'currency': (str) Currency name,
+                'available': (str) Amount of available currency,
+                'borrowed': (str) Borrowed amount,
+                'hold': (str) Frozen amount,
+                'maxAvailable': (str) Amount that can be withdrawn, including what's borrowable with margin,
+                'hourlyBorrowRate': (str) Borrow rate per hour,
+                'version': (str) Current version of the currency
+            }
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.accounts().get_borrow_status()
+            print(response)
+        """
+        params = {}
+        params.update(kwargs)
+
+        return self._request('GET', '/margin/borrowStatus', True, params=params)
+
+    def get_margin_max(self, symbol):
+        """
+        Get maximum and available buy/sell amount for a given symbol.
+
+        Args:
+            symbol (str, required): Symbol name.
+
+        Returns:
+            Json objects with maximum and available buy/sell amount for a given symbol:
+            {
+                'symbol': (str) Symbol name,
+                'maxLeverage': (int) Max leverage for the symbol,
+                'availableBuy': (str) Available amount for the quote currency that can be bought,
+                'maxAvailableBuy': (str) Maximum amount in quote currency that can be bought including margin,
+                'availableSell': (str) Available amount for the base currency that can be sold,
+                'maxAvailableSell': (str) Maximum amount in base currency that can be sold including margin
+            }
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.accounts().get_margin_max('BTC_USDT')
+            print(response)
+        """
+        params = {'symbol': symbol}
+
+        return self._request('GET', '/margin/maxSize', True, params=params)
