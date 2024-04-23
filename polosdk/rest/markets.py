@@ -417,3 +417,7 @@ class Markets:
             print(response)
         """
         return self._request('GET', '/markets/borrowRatesInfo')
+
+def get_symbols(self):
+    return self._request('GET', '/markets')
+    
