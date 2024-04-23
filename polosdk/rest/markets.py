@@ -418,6 +418,6 @@ class Markets:
         """
         return self._request('GET', '/markets/borrowRatesInfo')
 
-def get_symbols(self):
-    return self._request('GET', '/markets')
+    def get_symbols(self):
+        return self._request('GET', '/markets')
     
