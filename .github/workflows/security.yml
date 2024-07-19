@@ -1,0 +1,6 @@
+---
+name: Security Scans
+on: [pull_request]
+jobs:
+  security_credentials:
+    uses: poloniex/security-utils/.github/workflows/credentialScan.yml@master
