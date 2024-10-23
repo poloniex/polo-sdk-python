@@ -1,10 +1,10 @@
-from polosdk.rest.accounts import Accounts
-from polosdk.rest.subaccounts import Subaccounts
-from polosdk.rest.markets import Markets
-from polosdk.rest.request import Request
-from polosdk.rest.orders import Orders
-from polosdk.rest.smartorders import SmartOrders
-from polosdk.rest.wallets import Wallets
+from polosdk.spot.rest.accounts import Accounts
+from polosdk.spot.rest.subaccounts import Subaccounts
+from polosdk.spot.rest.markets import Markets
+from polosdk.spot.rest.request import Request
+from polosdk.spot.rest.orders import Orders
+from polosdk.spot.rest.smartorders import SmartOrders
+from polosdk.spot.rest.wallets import Wallets
 
 
 class Client:
@@ -29,7 +29,7 @@ class Client:
             url (str, optional): Url for endpoints, default is set to PROD in Request class.
         """
         self._accounts = Accounts(api_key, api_secret, url)
-        self._subaccounts = Subaccounts(api_key, api_secret, url)
+        self._accounts = Subaccounts(api_key, api_secret, url)
         self._markets = Markets(url)
         self._request = Request(url=url)
         self._orders = Orders(api_key, api_secret, url)
@@ -163,6 +163,54 @@ class Client:
         params = {'includeMultiChainCurrencies': multichain}
         return self._request('GET', f'/currencies/{currency}', params=params)
 
+    def get_currency_v2(self, currency):
+        """
+        Get data for a supported currency.
+
+        Args:
+            currency (str, required): Currency name.
+
+        Returns:
+            A list of json objects with the information on currencies:
+    [
+        {
+            'id': (int) currency id,
+            'coin': (str) currency symbol,
+            'delisted': (bool) designates whether (true) or not (false) this currency has been delisted from the exchange,
+            'tradeEnable': (bool) designates whether (true) or not (false) this currency can be traded on the exchange,
+            'name': (str) currency name,
+            'supportCollateral': (bool) indicates if this currency supports collateral in cross margin,
+            'supportBorrow': (bool) indicates if this currency supports borrows in cross margin,
+            'networkList': (Array of Json) the networks the currency runs on
+            {
+                'id': (int) currency id,
+                'coin': (str) currency symbol,
+                'name': (str) 	currency name,
+                'currencyType': (str) currency type: address or address-payment-id,
+                'blockchain': (str) the networks the currency runs on,
+                'withdrawalEnable': (bool) designates whether (true) or not (false) this currency can be withdrawn,
+                'depositEnable': (bool) designates whether (true) or not (false) this currency can be allowed to deposit,
+                'depositAddress': (str) if available, the deposit address for this currency,
+                'withdrawMin': (str) The minimum withdrawal amount, or a number less than or equal to 0 if none,
+                'decimals': (str) decimals of currency,
+                'withdrawFee': (str) withdraw fee of currency,
+                'minConfirm': (int) the minimum number of blocks necessary before a deposit can be credited to an account
+            },
+            ...
+        },
+        ...
+    ]
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.public().reference_data().get_currency_v2('BTC')
+            print(response)
+        """
+        params = {}
+        return self._request('GET', f'/currencies/{currency}', params=params)
+
     def get_currencies(self, multichain=False):
         """
         Get all supported currencies.
@@ -206,6 +254,53 @@ class Client:
         """
         params = {'includeMultiChainCurrencies': multichain}
         return self._request('GET', '/currencies', params=params)
+
+    def get_currencies_v2(self):
+        """
+        Get all supported currencies.
+
+        Args:
+
+        Returns:
+            A list of json objects with the information on currencies:
+    [
+        {
+            'id': (int) currency id,
+            'coin': (str) currency symbol,
+            'delisted': (bool) designates whether (true) or not (false) this currency has been delisted from the exchange,
+            'tradeEnable': (bool) designates whether (true) or not (false) this currency can be traded on the exchange,
+            'name': (str) currency name,
+            'supportCollateral': (bool) indicates if this currency supports collateral in cross margin,
+            'supportBorrow': (bool) indicates if this currency supports borrows in cross margin,
+            'networkList': (Array of Json) the networks the currency runs on
+            {
+                'id': (int) currency id,
+                'coin': (str) currency symbol,
+                'name': (str) 	currency name,
+                'currencyType': (str) currency type: address or address-payment-id,
+                'blockchain': (str) the networks the currency runs on,
+                'withdrawalEnable': (bool) designates whether (true) or not (false) this currency can be withdrawn,
+                'depositEnable': (bool) designates whether (true) or not (false) this currency can be allowed to deposit,
+                'depositAddress': (str) if available, the deposit address for this currency,
+                'withdrawMin': (str) The minimum withdrawal amount, or a number less than or equal to 0 if none,
+                'decimals': (str) decimals of currency,
+                'withdrawFee': (str) withdraw fee of currency,
+                'minConfirm': (int) the minimum number of blocks necessary before a deposit can be credited to an account
+            },
+            ...
+        },
+        ...
+    ]
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.ref_data().get_currencies_v2()
+            print(response)
+        """
+        params = {}
+        return self._request('GET', '/v2/currencies', params=params)
 
     def get_timestamp(self):
         """

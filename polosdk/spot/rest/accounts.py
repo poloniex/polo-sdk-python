@@ -1,10 +1,10 @@
-from polosdk.rest.request import Request
+from polosdk.spot.rest.request import Request
 
 
 class Accounts:
     """
     Accounts class handles all endpoints related to account.
-
+  这里是私有的account+margin
     Attributes:
         _request (Request): Class used to handle REST requests.
     """
@@ -136,6 +136,59 @@ class Accounts:
             print(response)
         """
         return self._request('GET', '/feeinfo', True)
+
+    def get_interest_history(self, limit=None, begins_from=None, direction=None, start_time=None, end_time=None, **kwargs):
+        """
+        Get a list of interest collection records of a user. Max interval for start and end time is 90 days.
+         If no start/end time params are specified then records for last 7 days will be returned.
+
+        Args:
+            limit (int, optional): The max number of records could be returned. Default is 10 and max is 100 records.
+            begins_from (int, optional): it is 'id'. The query begin at ‘from', and the default is 0.
+            direction (str, optional): PRE, NEXT, default is NEXT
+            start_time (int, optional): (milliseconds since UNIX epoch) records before start time will not be retrieved.
+            end_time (int, optional): (milliseconds since UNIX epoch) records after end time will not be retrieved.
+
+        Returns:
+            List of json objects with account transfer information:
+            [
+                {
+                    'id': (str) record ID,
+                    'interestAccuredTime': (int) Interest collection time,
+                    'currencyName': (str) Asset name,
+                    'principal': (str) Principal,
+                    'interest': (str) interest,
+                    'interestRate': (str) interest rate
+                },
+                {...},
+                ...
+            ]
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.accounts().get_interest_history()
+            print(response)
+        """
+        params = {}
+        params.update(kwargs)
+        if limit is not None:
+            params.update({'limit': limit})
+
+        if begins_from is not None:
+            params.update({'from': begins_from})
+
+        if direction is not None:
+            params.update({'direction': direction})
+
+        if start_time is not None:
+            params.update({'startTime': start_time})
+
+        if end_time is not None:
+            params.update({'endTime': end_time})
+
+        return self._request('GET', '/accounts/interest/history', True, params=params)
 
     def transfer(self, currency, amount, from_account, to_account):
         """

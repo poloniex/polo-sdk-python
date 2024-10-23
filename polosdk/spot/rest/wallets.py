@@ -1,4 +1,4 @@
-from polosdk.rest.request import Request
+from polosdk.spot.rest.request import Request
 import time
 
 
@@ -196,3 +196,51 @@ class Wallets:
             body.update({'allowBorrow': allow_borrow})
 
         return self._request('POST', '/wallets/withdraw', True, body=body)
+
+    def withdraw_v2(self, coin, network, amount, address, address_tag=None, allow_borrow=None):
+        """
+        Immediately places a withdrawal for a given currency, with no email confirmation. In order to use this method,
+        withdrawal privilege must be enabled for your API key.
+
+        Some currencies use a common deposit address for everyone on the exchange and designate the account for which
+        this payment is destined by populating memo field. In these cases, use /v2/currencies to look up the
+        mainAccount for the currency to find the deposit address and use the address returned by /v2/wallets/addresses
+        or generate one using /v2/wallets/address as the memo. Note: /v2/currencies will only include a mainAccount
+        property for currencies which require a memo.
+
+        Args:
+            coin (str, required): the currency to use for the deposit address, like "BTC, USDT or USDD".
+            network (str, required): The target network to withdraw to, like "BTC, ETH or TRX".
+            amount (str, required): withdrawal amount.
+            address (str, required): Withdrawal address.
+            address_tag (str, optional): memo for currencies that use a command deposit address.
+            allow_borrow (bool, optional): allow to transfer borrowed funds (Default: false)
+
+        Returns:
+            Json object with the withdrawal reference ID:
+            {
+                'withdrawalRequestsId': (int) The withdrawal reference ID
+            }
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.wallets().withdraw_v2(
+                          'ETH', 'ETH', '1.50', '0xbb8d0d7c346daecc2380dabaa91f3ccf8ae232fb4')
+            print(response)
+        """
+        body = {
+            'coin': coin,
+            'network': network,
+            'amount': amount,
+            'address': address
+        }
+
+        if address_tag is not None:
+            body.update({'addressTag': address_tag})
+
+        if allow_borrow is not None:
+            body.update({'allowBorrow': allow_borrow})
+
+        return self._request('POST', '/v2/wallets/withdraw', True, body=body)

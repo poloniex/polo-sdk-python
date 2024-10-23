@@ -1,4 +1,4 @@
-from polosdk.rest.request import Request
+from polosdk.spot.rest.request import Request
 
 
 class Markets:
@@ -17,6 +17,33 @@ class Markets:
         """
         self._request = Request(url=url)
 
+    def getsymbol(self, symbol):
+        return self._request('GET', f'/markets/{symbol}')
+
+    def getsymbols(self):
+        return self._request('GET', f'/markets')
+    def getcurrencies(self, **kwargs):
+        params = {}
+        params.update( kwargs )
+        return self._request('GET', f'/currencies')
+    def getcurrency(self, currency,**kwargs):
+        if currency is None:
+            raise ValueError("Currency must be provided")
+        params = {}
+        params.update( kwargs )
+        return self._request('GET', f'/currencies/{currency}')
+    def getcurrenciesv2(self, **kwargs):
+        params = {}
+        params.update( kwargs )
+        return self._request('GET', f'/v2/currencies')
+    def getcurrencyv2(self, currency,**kwargs):
+        if currency is None:
+            raise ValueError("Currency must be provided")
+        params = {}
+        params.update( kwargs )
+        return self._request('GET', f'/v2/currencies/{currency}')
+    def gettimestamp(self):
+        return self._request('GET', f'/timestamp')
     def get_candles(self, symbol, interval, start_time=None, end_time=None, **kwargs):
         """
         Returns OHLC for a symbol at given timeframe (interval).
