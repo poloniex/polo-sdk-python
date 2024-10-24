@@ -1,9 +1,11 @@
-from polosdk.ws.client_base import ClientBase
+
 from urllib.parse import urljoin
 import base64
 import hashlib
 import hmac
 from datetime import datetime
+
+from polosdk.futures.ws.client_base import ClientBase
 
 _default_ws_url = 'wss://ws.poloniex.com/ws/'
 
@@ -72,3 +74,45 @@ class ClientAuthenticated(ClientBase):
         sig_hash = hmac.new(api_secret.encode('utf8'), payload.encode('utf8'), hashlib.sha256).digest()
         secret_key = base64.b64encode(sig_hash).decode()
         return secret_key
+
+    async def subscribe_to_positions(self):
+        """订阅市场深度LV2"""
+        subscribe_message = {
+            "event": "subscribe",
+  "channel": ["positions"],
+  "symbols": ["BTC_USDT_PERP"]
+        }
+        await self._send_message(subscribe_message)
+
+    async def subscribe_to_orders(self):
+        """订阅市场深度LV2"""
+        subscribe_message = {
+            "event": "subscribe",
+            "channel": ["orders"],
+            "symbols": ["BTC_USDT_PERP"]
+        }
+        await self._send_message(subscribe_message)
+
+    async def subscribe_to_trade(self):
+        """订阅市场深度LV2"""
+        subscribe_message = {
+            "event": "subscribe",
+            "channel": ["trade"],
+            "symbols": ["BTC_USDT_PERP"]
+        }
+        await self._send_message(subscribe_message)
+
+    async def subscribe_to_account(self):
+        """订阅市场深度LV2"""
+        subscribe_message = {
+            "event": "subscribe",
+            "channel": ["account"],
+            "symbols": ["BTC_USDT_PERP"]
+        }
+        await self._send_message(subscribe_message)
+
+
+
+
+
+

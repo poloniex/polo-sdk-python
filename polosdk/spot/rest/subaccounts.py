@@ -1,4 +1,4 @@
-from polosdk.rest.request import Request
+from polosdk.spot.rest.request import Request
 
 
 class Subaccounts:
