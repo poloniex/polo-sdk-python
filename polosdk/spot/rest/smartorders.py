@@ -1,10 +1,10 @@
-from polosdk.rest.request import Request
+from polosdk.spot.rest.request import Request
 
 
 class SmartOrders:
     """
     Smart orders class handles all endpoints related to smart orders.
-
+私有的smart orders
     Attributes:
         _request (Request): Class used to handle REST requests.
     """

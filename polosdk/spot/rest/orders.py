@@ -1,10 +1,10 @@
-from polosdk.rest.request import Request
+from polosdk.spot.rest.request import Request
 
 
 class Orders:
     """
     Orders class handles all endpoints related to orders.
-
+这里是私有的orders+trsdes+order history
     Attributes:
         _request (Request): Class used to handle REST requests.
     """
@@ -559,7 +559,7 @@ class Orders:
 
     def set_kill_switch(self, timeout):
         """
-        Kill switch mechanism allows to set a timer that cancels all regular and smartorders after the timeout has
+        Kill switch mechanism /orders/{id}ows to set a timer that cancels all regular and smartorders after the timeout has
         expired. Timeout can be reset by calling this command again with a new timeout value. A timeout value of -1
         disables the timer. Timeout is defined in seconds.
 

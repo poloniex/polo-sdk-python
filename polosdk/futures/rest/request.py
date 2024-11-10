@@ -31,7 +31,7 @@ class RequestError(Exception):
 
 def encode_uri_component(component):
     return urllib.parse.quote(str(component), safe='~()*!\'')
-
+#**urllib.parse.quote(...)**：使用 quote 函数对字符串进行 URL 编码。它会将字符串中不安全的字符替换为其百分号编码的形式。
 
 class Request:
     """
