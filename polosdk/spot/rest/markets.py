@@ -446,5 +446,57 @@ class Markets:
         return self._request('GET', '/markets/borrowRatesInfo')
 
     def get_symbols(self):
+        """
+        Get reference data for all symbols.
+
+        Returns:
+            A list of json objects with the latest symbol information:
+                [
+                    {
+                        'symbol': (str) Symbol name,
+                        'baseCurrencyName': (str) Base currency name,
+                        'quoteCurrencyName': (str) quote currency name,
+                        'displayName': (str) Symbol display name,
+                        'state': (str) NORMAL, PAUSE, POST_ONLY,
+                        'visibleStartTime': (int) Time since symbol is visible in the frontend,
+                        'tradableStartTime': (int) Time since symbol is tradable,
+                        'symbolTradeLimit': (obj) Symbol market configuration with the following fields:
+                            'symbol': (str) Symbol name,
+                            'priceScale': (int) Decimal precision for price,
+                            'quantityScale': (int) Decimal precision for quantity,
+                            'amountScale': (int) Decimal precision for amount,
+                            'minQuantity': (str) Minimum required quantity,
+                            'minAmount': (str) Minimum required amount,
+                            'highestBid': (str) Maximum allowed bid price (market bound),
+                            'lowestAsk': (str) Minimum allowed ask price (market bound),
+                        'crossMargin': (obj) Symbol cross margin info with the following fields:
+                            'supportCrossMargin': (bool) Indicates if symbol supports cross margin,
+                            'maxLeverage': (int) Maximum supported leverage
+                    },
+                    {...},
+                    ...
+                ]
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.markets().get_symbols()
+            print(response)
+        """
         return self._request('GET', '/markets')
-    
+
+    def get_symbol(self, symbol):
+        """
+        Get reference data for a symbol.
+
+        Returns: see get_symbols
+
+        Raises:
+            RequestError: An error occurred communicating with trade engine.
+
+        Example:
+            response = client.markets().get_symbol('BTC_USDT')
+            print(response)
+        """
+        return self._request('GET', '/markets/{symbol}')
