@@ -29,7 +29,7 @@ class Client:
             url (str, optional): Url for endpoints, default is set to PROD in Request class.
         """
         self._accounts = Accounts(api_key, api_secret, url)
-        self._accounts = Subaccounts(api_key, api_secret, url)
+        self._subaccounts = Subaccounts(api_key, api_secret, url)
         self._markets = Markets(url)
         self._request = Request(url=url)
         self._orders = Orders(api_key, api_secret, url)
