@@ -10,7 +10,7 @@ class Private:
         return self._request('GET',f'/v3/account/balance', True)
 
 
-    def place_order(self, symbol, side, order_type, sz, clOrdId=None, px=None, reduceOnly=False, timeInForce='GTC',
+    def place_order(self, symbol, side, order_type, sz, mgnMode, posSide, clOrdId=None, px=None, reduceOnly=False, timeInForce='GTC',
                     stpMode='NONE'):
         # 参数验证
         if side not in ['BUY', 'SELL']:
@@ -21,6 +21,8 @@ class Private:
         # 构建请求体
         order_data = {
             'symbol': symbol,
+            'mgnMode': mgnMode,
+            'posSide': posSide,
             'side': side,
             'type': order_type,
             'sz': sz,
@@ -53,6 +55,10 @@ class Private:
                 raise ValueError("Each order must have a 'type' and it must be 'MARKET', 'LIMIT', or 'LIMIT_MAKER'")
             if 'sz' not in order:
                 raise ValueError("Each order must have a 'sz' (size)")
+            if 'mgnMode' not in order:
+                raise ValueError("Each order must have a 'mgnMode'")
+            if 'posSide' not in order:
+                raise ValueError("Each order must have a 'posSide'")
 
         # 发送请求
         return self._request('POST', '/v3/trade/orders', True, body=orders)
@@ -92,12 +98,13 @@ class Private:
         return self._request('DELETE', '/v3/trade/allOrders', True, params=params)
 
 
-    def close_at_market_price(self, symbol, **kwargs):
+    def close_at_market_price(self, symbol, mgnMode, **kwargs):
         if symbol is None:
             raise ValueError("symbol is need")
         params = {}
         params.update(kwargs)
         params.update({'symbol': symbol})
+        params.update({'mgnMode': mgnMode})
         return self._request('POST', '/v3/trade/position', True, body=params)
 
 
@@ -135,7 +142,7 @@ class Private:
         return self._request('GET', '/v3/trade/position/history', True, params=params)
 
 
-    def adjust_margin(self, symbol, amt, type):
+    def adjust_margin(self, symbol, amt, type, posSide = None):
         if symbol is None:
             raise ValueError("symbol is need")
         if amt is None or type is None:
@@ -144,38 +151,61 @@ class Private:
         params.update({'symbol': symbol})
         params.update({'amt': amt})
         params.update({'type': type})
+        if posSide != None:
+            params.update({'posSide': posSide})
         return self._request('POST', '/v3/trade/position/margin', True, body=params)
 
 
-    def switch_cross(self, symbol, mgnMode):
-        if symbol is None or mgnMode is None:
-            raise ValueError("symbol or mgnMode is need")
-        params = {}
-        params.update({'symbol': symbol})
-        params.update({'mgnMode': mgnMode})
-        return self._request('POST', '/v3/position/switchIsolated', True, body=params)
+    # def switch_cross(self, symbol, mgnMode):
+    #     if symbol is None or mgnMode is None:
+    #         raise ValueError("symbol or mgnMode is need")
+    #     params = {}
+    #     params.update({'symbol': symbol})
+    #     params.update({'mgnMode': mgnMode})
+    #     return self._request('POST', '/v3/position/switchIsolated', True, body=params)
 
 
-    def get_margin_mode(self, symbol):
-        if symbol is None:
-            raise ValueError("symbol is need")
-        params = {}
-        params.update({'symbol': symbol})
-        return self._request('GET', '/v3/position/marginType', True, params=params)
+    # def get_margin_mode(self, symbol):
+    #     if symbol is None:
+    #         raise ValueError("symbol is need")
+    #     params = {}
+    #     params.update({'symbol': symbol})
+    #     return self._request('GET', '/v3/position/marginType', True, params=params)
 
 
-    def get_leverge(self, symbol):
-        if symbol is None:
-            raise ValueError("symbol is need")
-        params = {}
-        params.update({'symbol': symbol})
-        return self._request('GET', '/v3/position/leverage', True, params=params)
+    # def get_leverge(self, symbol):
+    #     if symbol is None:
+    #         raise ValueError("symbol is need")
+    #     params = {}
+    #     params.update({'symbol': symbol})
+    #     return self._request('GET', '/v3/position/leverage', True, params=params)
 
 
-    def set_leverge(self, symbol, lever):
+    def set_leverge(self, symbol, lever, mgnMode, posSide):
         if symbol is None or lever is None:
             raise ValueError("symbol  or lever is need")
         params = {}
         params.update({'symbol': symbol})
         params.update({'lever': lever})
+        params.update({'mgnMode': mgnMode})
+        params.update({'posSide': posSide})
         return self._request('POST', '/v3/position/leverage', True, body=params)
+
+    def set_position_mode(self, posMode):
+        if posMode is None:
+            raise ValueError("symbol  or lever is need")
+        params = {}
+        params.update({'posMode': posMode})
+        return self._request('POST', '/v3/position/mode', True, body=params)
+
+    def get_position_mode(self):
+        params = {}
+        return self._request('GET', '/v3/position/mode', True, params=params)
+
+    def get_leverges(self, symbol, mgnMode):
+        if symbol is None:
+            raise ValueError("symbol is need")
+        params = {}
+        params.update({'symbol': symbol})
+        params.update({'mgnMode': mgnMode})
+        return self._request('GET', '/v3/position/leverages', True, params=params)
