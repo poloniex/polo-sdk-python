@@ -209,7 +209,7 @@ class Client:
             print(response)
         """
         params = {}
-        return self._request('GET', f'/currencies/{currency}', params=params)
+        return self._request('GET', f'/v2/currencies/{currency}', params=params)
 
     def get_currencies(self, multichain=False):
         """
